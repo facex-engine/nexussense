@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" role="img" aria-label="Events emitted by NexusSense on a real H.264 sample">
+  <style>
+    .ttl{font:700 16px -apple-system,'Segoe UI',sans-serif;fill:#0a1929}
+    .lbl{font:600 12px -apple-system,'Segoe UI',sans-serif;fill:#0a1929}
+    .num{font:700 12px 'Consolas','SF Mono',monospace;fill:#0a1929}
+    .mono{font:400 11px 'Consolas','SF Mono',monospace;fill:#475569}
+    .sub{font:400 11px -apple-system,sans-serif;fill:#475569}
+    .green{fill:#15803d}
+    .yellow{fill:#a16207}
+    .axis{stroke:#cbd5e1;stroke-width:1}
+  </style>
+  <text x="20" y="24" class="ttl">Реальный output на сэмпле motion_event.h264</text>
+  <text x="20" y="42" class="sub">4 MB Annex-B · 116 NAL units · 102 frame events · 0.003 s · → 33 289 NAL/s</text>
+
+  <!-- Timeline -->
+  <line x1="80" y1="120" x2="720" y2="120" class="axis"/>
+  <text x="20" y="125" class="lbl">PTS</text>
+
+  <!-- Time markers (us) -->
+  <text x="80" y="140" class="mono">0</text>
+  <text x="240" y="140" class="mono">2.3 s</text>
+  <text x="380" y="140" class="mono">2.5 s</text>
+  <text x="520" y="140" class="mono">3.3 s</text>
+  <text x="720" y="140" class="mono" text-anchor="end">3.4 s</text>
+
+  <!-- Events -->
+  <g>
+    <!-- MOTION_START at 2.33 s -->
+    <circle cx="240" cy="120" r="6" class="green"/>
+    <line x1="240" y1="120" x2="240" y2="80" stroke="#15803d" stroke-width="1.5"/>
+    <text x="240" y="76" class="num green" text-anchor="middle">MOTION_START</text>
+    <text x="240" y="62" class="mono green" text-anchor="middle">conf=0.90  intensity=0.144</text>
+
+    <!-- MOTION_STOP at 2.46 s -->
+    <circle cx="380" cy="120" r="6" class="yellow"/>
+    <line x1="380" y1="120" x2="380" y2="180" stroke="#a16207" stroke-width="1.5"/>
+    <text x="380" y="194" class="num yellow" text-anchor="middle">MOTION_STOP</text>
+    <text x="380" y="208" class="mono yellow" text-anchor="middle">conf=0.90</text>
+
+    <!-- MOTION_START at 3.26 s -->
+    <circle cx="520" cy="120" r="6" class="green"/>
+    <line x1="520" y1="120" x2="520" y2="80" stroke="#15803d" stroke-width="1.5"/>
+    <text x="520" y="76" class="num green" text-anchor="middle">MOTION_START</text>
+    <text x="520" y="62" class="mono green" text-anchor="middle">conf=0.90  intensity=0.117</text>
+  </g>
+
+  <!-- Output box -->
+  <rect x="20" y="240" width="720" height="68" fill="#0a1929" stroke="#475569"/>
+  <text x="35" y="262" class="mono" fill="#cbd5e1">$ ./nexussense-bench samples/motion_event.h264</text>
+  <text x="35" y="280" class="mono" fill="#15803d">  [t=2333310 us] MOTION_START (0x0100)  conf=0.90  intensity=0.144</text>
+  <text x="35" y="297" class="mono" fill="#a16207">  [t=2466642 us] MOTION_STOP  (0x0101)  conf=0.90</text>
+</svg>
