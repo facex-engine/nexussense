@@ -1,6 +1,6 @@
 # NexusSense
 
-> Bitstream Intelligence Engine. **Compressed-domain analytics** на H.264/H.265 — motion / health / scene detection прямо из NAL units, без декода в RGB. **56 KB**, **33 000 NAL/s** на одно ядро, ~0% CPU.
+> Bitstream Intelligence Engine. **Compressed-domain analytics** on H.264/H.265 — motion / health / scene detection straight from NAL units, no decode to RGB. **56 KB**, **33,000 NAL/s** per core, ~0% CPU.
 
 [![status](https://img.shields.io/badge/status-production-15803d?style=flat-square)](#)
 [![size](https://img.shields.io/badge/library-56%20KB-1d4ed8?style=flat-square)](#)
@@ -8,19 +8,19 @@
 [![cpu](https://img.shields.io/badge/CPU-~0%25-15803d?style=flat-square)](#)
 [![lang](https://img.shields.io/badge/lang-C99-475569?style=flat-square)](#)
 
-NexusSense парсит структуру H.264/H.265 битстрима и извлекает события **без декодирования в пиксели**. Для NVR с десятками камер это означает: motion detection, freeze/blackout/scene-change alerts работают за «бесплатно» относительно полного декод-pipeline'а.
+NexusSense parses the H.264/H.265 bitstream structure and extracts events **without decoding to pixels**. For an NVR running dozens of cameras this means: motion detection, freeze/blackout/scene-change alerts come essentially for free relative to a full decode pipeline.
 
-Часть стека [NexusEye](https://github.com/facex-engine).
+Part of the [NexusEye](https://github.com/facex-engine) stack.
 
 ---
 
-## Где живёт NexusSense в архитектуре
+## Where NexusSense lives in the architecture
 
 ![analytics tiers](docs/analytics-tiers.svg)
 
-NexusSense — это **ярус 0**. Когда у камеры нет встроенного AI на NPU (ярус 2 — Hikvision/Dahua/Axis edge events), и pixel-domain CV (ярус 1) — слишком дорого для вашей нагрузки, NexusSense ловит мотив прямо из bitstream'а.
+NexusSense is **Tier 0**. When a camera has no built-in AI on its NPU (Tier 2 — Hikvision/Dahua/Axis edge events), and pixel-domain CV (Tier 1) is too expensive for your workload, NexusSense catches motion straight from the bitstream.
 
-## Как выглядит реальный output
+## Real-world output
 
 ![events flow](docs/events-flow.svg)
 
@@ -31,7 +31,7 @@ nexussense-bench · file=samples/motion_event.h264 · size=4.02 MB
   [t=2466642 us] MOTION_STOP  (0x0101)  conf=0.90
   [t=3266634 us] MOTION_START (0x0100)  conf=0.90  intensity=0.117
 
-Processed: 116 NAL units (102 frame events)  in 0.003 s = 33 289 NAL/s
+Processed: 116 NAL units (102 frame events)  in 0.003 s = 33,289 NAL/s
 Events emitted:
   motion_start: 2
   motion_stop:  1
@@ -39,18 +39,18 @@ Events emitted:
 
 ---
 
-## Что умеет
+## Capabilities
 
-| Модуль          | Флаг              | Что детектирует                                       |
+| Module          | Flag              | What it detects                                       |
 |-----------------|-------------------|-------------------------------------------------------|
-| Motion          | `BIE_MOD_MOTION`  | size-spike детектор по P-кадрам, EWMA-baseline        |
-| Tracker         | `BIE_MOD_TRACKER` | объект-трекинг по motion vectors (CABAC walker)       |
+| Motion          | `BIE_MOD_MOTION`  | size-spike detector on P-frames, EWMA baseline        |
+| Tracker         | `BIE_MOD_TRACKER` | object tracking via motion vectors (CABAC walker)     |
 | Health          | `BIE_MOD_HEALTH`  | freeze · blackout · whiteout · scene-change · framedrop |
 | Forensic        | `BIE_MOD_FORENSIC`| double-compression, GOP breaks, SPS changes           |
 | Scene           | `BIE_MOD_SCENE`   | indoor/outdoor · day/night · activity level           |
-| Privacy         | `BIE_MOD_PRIVACY` | DCT-domain redaction (без полного re-encode)          |
+| Privacy         | `BIE_MOD_PRIVACY` | DCT-domain redaction (no full re-encode)              |
 
-Все модули включаются битмаской на `bie_stream_open()`, можно держать только нужные.
+All modules are toggled by a bitmask on `bie_stream_open()` — keep only what you need.
 
 ---
 
@@ -59,20 +59,20 @@ Events emitted:
 ```c
 #include "bie.h"
 
-/* 1. Инициализация */
+/* 1. Initialize */
 bie_config_t cfg = bie_config_default();
 bie_engine_t* eng = bie_create(&cfg);
 
 bie_set_callback(eng, on_event, /* user_data */ NULL);
 
-/* 2. Открываем stream (один engine может держать N streams от разных камер) */
+/* 2. Open a stream (one engine can manage N streams from different cameras) */
 int modules = BIE_MOD_MOTION | BIE_MOD_HEALTH | BIE_MOD_SCENE;
 bie_stream_t* str = bie_stream_open(eng, "cam-225", BIE_CODEC_H264, modules);
 
-/* 3. Кормим NAL unit'ами по мере их появления */
+/* 3. Feed NAL units as they arrive */
 while (read_nal(rtsp_session, nal_data, &nal_len)) {
     int r = bie_process_nalu(str, nal_data, nal_len, pts_us);
-    if (r > 0) bie_run_modules(eng, str);    /* запустить аналитику на frame */
+    if (r > 0) bie_run_modules(eng, str);    /* run analytics on the frame */
 }
 
 /* 4. Cleanup */
@@ -89,7 +89,7 @@ void on_event(bie_event_t* ev, void* user) {
 
 ---
 
-## События
+## Events
 
 ```c
 typedef enum {
@@ -126,11 +126,11 @@ typedef enum {
 } bie_event_type_t;
 ```
 
-Каждое событие несёт `confidence` (0.0–1.0), `timestamp_us` и type-specific payload (intensity для motion, baseline+metric для health, и т.д.).
+Every event carries `confidence` (0.0–1.0), `timestamp_us`, and a type-specific payload (intensity for motion, baseline+metric for health, etc.).
 
 ---
 
-## Конфигурация чувствительности
+## Sensitivity tuning
 
 ```c
 typedef struct {
@@ -147,13 +147,13 @@ typedef struct {
 } bie_config_t;
 ```
 
-Все пороги адаптивны (EWMA — Exponentially Weighted Moving Average) и сами подстраиваются под характер сцены. Для коротких demo-клипов в `bench.c` зашиты более чувствительные значения.
+All thresholds are adaptive (EWMA — Exponentially Weighted Moving Average) and self-tune to the scene character. The bundled `bench.c` ships with more sensitive demo values for short clips.
 
 ---
 
 ## Quick start
 
-### Linux x86-64 (готовый бинарник)
+### Linux x86-64 (prebuilt binary)
 
 ```bash
 wget https://github.com/facex-engine/nexussense/releases/latest/download/nexussense-linux-x64.tar.gz
@@ -162,7 +162,7 @@ cd nexussense
 ./nexussense-bench samples/motion_event.h264
 ```
 
-### Сборка из исходника
+### Build from source
 
 ```bash
 git clone https://github.com/facex-engine/nexussense
@@ -171,34 +171,34 @@ make            # → libnexussense.a (56 KB)
 make bench      # → nexussense-bench
 ```
 
-Требования: `gcc ≥ 9` или `clang`, `make`, glibc.
+Requirements: `gcc ≥ 9` or `clang`, `make`, glibc.
 
 ---
 
-## Производительность
+## Performance
 
-| Сэмпл              | Размер    | NAL units | Wall-clock | Throughput     |
-|--------------------|-----------|-----------|------------|----------------|
-| `test_idr.h264`    | 339 KB    | 5         | < 1 ms     | —              |
-| `motion_event.h264`| 4.02 MB   | 116       | 0.003 s    | **33 289 NAL/s** |
+| Sample              | Size      | NAL units | Wall-clock | Throughput      |
+|---------------------|-----------|-----------|------------|-----------------|
+| `test_idr.h264`     | 339 KB    | 5         | < 1 ms     | —               |
+| `motion_event.h264` | 4.02 MB   | 116       | 0.003 s    | **33,289 NAL/s** |
 
-На полноценной нагрузке (50 камер @ 25 fps × ~25 NAL/frame) это означает **~31 000 NAL/s сумарно**, что NexusSense закрывает на одном ядре с большим запасом.
+In a real workload (50 cameras @ 25 fps × ~25 NAL/frame ≈ ~31,000 NAL/s) NexusSense covers everything on one core with headroom to spare.
 
 ---
 
-## Лицензия
+## License
 
-MIT — см. [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
 
-## Автор
+## Author
 
 **Baurzhan Atynov** ([@bauratynov](https://github.com/bauratynov))
 
-## Часть стека NexusEye
+## Part of the NexusEye stack
 
-| Компонент | Что делает | Размер |
-|-----------|------------|--------|
-| [NexusDecode](https://github.com/facex-engine/nexusdecode) | H.264 декод без FFmpeg | 497 KB |
-| [NexusInfer](https://github.com/facex-engine/nexusinfer) | YOLO inference на CPU, замена ONNX | 159 KB |
-| **NexusSense** *(вы здесь)* | Compressed-domain analytics | 56 KB |
-| [FaceX](https://github.com/facex-engine/facex) | Face embedding INT8 на CPU | 180 KB |
+| Component | What it does | Size |
+|-----------|--------------|------|
+| [NexusDecode](https://github.com/facex-engine/nexusdecode) | H.264 decode without FFmpeg | 497 KB |
+| [NexusInfer](https://github.com/facex-engine/nexusinfer) | YOLO inference on CPU, ONNX Runtime replacement | 159 KB |
+| **NexusSense** *(you are here)* | Compressed-domain analytics | 56 KB |
+| [FaceX](https://github.com/facex-engine/facex) | Face embedding INT8 on CPU | 180 KB |

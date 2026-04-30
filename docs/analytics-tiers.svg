@@ -9,15 +9,14 @@
     .cost-mid{font:700 11px 'Consolas',monospace;fill:#a16207}
     .cost-high{font:700 11px 'Consolas',monospace;fill:#dc2626}
   </style>
-  <text x="20" y="24" class="ttl">Где живёт NexusSense — ярус 0 (compressed-domain)</text>
-  <text x="20" y="42" class="sub">Принцип: использовать самый дешёвый ярус, покрывающий требуемую функциональность.</text>
+  <text x="20" y="24" class="ttl">Where NexusSense lives — Tier 0 (compressed-domain)</text>
+  <text x="20" y="42" class="sub">Principle: use the cheapest tier that covers the required functionality.</text>
 
-  <!-- Tier 0 - NexusSense -->
   <rect x="20" y="60" width="720" height="110" rx="6" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
-  <text x="40" y="84" class="h">Ярус 0 — Compressed-domain (NexusSense)</text>
-  <text x="40" y="100" class="sub">парсим NAL units напрямую, без декодирования в RGB</text>
+  <text x="40" y="84" class="h">Tier 0 — Compressed-domain (NexusSense)</text>
+  <text x="40" y="100" class="sub">parse NAL units directly, no decode to RGB</text>
   <text x="720" y="84" class="cost-low" text-anchor="end">~0% CPU</text>
-  <text x="720" y="100" class="cost-low" text-anchor="end">33 000 NAL/sec на одно ядро</text>
+  <text x="720" y="100" class="cost-low" text-anchor="end">33,000 NAL/sec per core</text>
 
   <rect x="40" y="116" width="220" height="44" fill="#fff" stroke="#15803d"/>
   <text x="55" y="134" class="lbl">NAL motion detector</text>
@@ -31,12 +30,11 @@
   <text x="515" y="134" class="lbl">Health monitor</text>
   <text x="515" y="152" class="sub">freeze, blackout, scene-change</text>
 
-  <!-- Tier 1 -->
   <rect x="20" y="190" width="720" height="80" rx="6" fill="#fef3c7" stroke="#a16207" stroke-width="1.5"/>
-  <text x="40" y="214" class="h">Ярус 1 — Pixel-domain</text>
-  <text x="40" y="230" class="sub">единственный полный декод, далее fan-out к N consumer'ам</text>
+  <text x="40" y="214" class="h">Tier 1 — Pixel-domain</text>
+  <text x="40" y="230" class="sub">single full decode, then fan-out to N consumers</text>
   <text x="720" y="214" class="cost-mid" text-anchor="end">~15-25% CPU</text>
-  <text x="720" y="230" class="cost-mid" text-anchor="end">decoder + classifier на пиксели</text>
+  <text x="720" y="230" class="cost-mid" text-anchor="end">decoder + classifiers on pixels</text>
 
   <rect x="40" y="240" width="340" height="22" fill="#fff" stroke="#a16207"/>
   <text x="55" y="256" class="num">NexusDecode (H.264) → Frame Service ring</text>
@@ -44,12 +42,11 @@
   <rect x="390" y="240" width="330" height="22" fill="#fff" stroke="#a16207"/>
   <text x="405" y="256" class="num">NexusInfer (YOLO) + FaceX (faces)</text>
 
-  <!-- Tier 2 -->
   <rect x="20" y="290" width="720" height="80" rx="6" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
-  <text x="40" y="314" class="h">Ярус 2 — Edge AI (камера → JSON event)</text>
-  <text x="40" y="330" class="sub">подписка на native AI-события камеры через её фирменный протокол</text>
+  <text x="40" y="314" class="h">Tier 2 — Edge AI (camera → JSON event)</text>
+  <text x="40" y="330" class="sub">subscribe to native AI events from the camera over its proprietary protocol</text>
   <text x="720" y="314" class="cost-low" text-anchor="end">0% CPU</text>
-  <text x="720" y="330" class="cost-low" text-anchor="end">vendor NPU делает всю работу</text>
+  <text x="720" y="330" class="cost-low" text-anchor="end">vendor NPU does all the work</text>
 
   <rect x="40" y="340" width="160" height="22" fill="#fff" stroke="#1d4ed8"/>
   <text x="55" y="356" class="num">Hikvision ISAPI</text>
@@ -63,6 +60,6 @@
   <rect x="550" y="340" width="170" height="22" fill="#fff" stroke="#1d4ed8"/>
   <text x="565" y="356" class="num">Hanwha SUNAPI</text>
 
-  <text x="20" y="400" class="sub">NexusSense — это нижняя ступень. Когда камера не имеет встроенного AI и декод слишком дорог,</text>
-  <text x="20" y="416" class="sub">мы детектим motion / freeze / scene-change прямо из bitstream, фактически бесплатно.</text>
+  <text x="20" y="400" class="sub">NexusSense is the bottom rung. When the camera has no built-in AI and full decode is too expensive,</text>
+  <text x="20" y="416" class="sub">we detect motion / freeze / scene-change directly from the bitstream — essentially for free.</text>
 </svg>
